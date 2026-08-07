@@ -1,7 +1,8 @@
 """匹配 + 简历模块集成测试（TE-M4-01，设计文档 §11.3.9）。
 
 覆盖 match compare/result/gap/path/feedback 和 resume detail/parse stream。
-基础设施不可达时由 conftest 统一 skip。
+resume 端点纯 PG（resume_cache），compare/recommend 依赖 Neo4j 图谱。
+PG+Redis 不可达时由 conftest 统一 skip；Neo4j 不可达时 compare/recommend 用例 skip。
 """
 
 import httpx
@@ -21,10 +22,12 @@ def _get_resume_id(client: httpx.Client, auth_headers) -> str | None:
 class TestMatchCompare:
     """人岗比对端点。"""
 
-    def test_compare(self, client: httpx.Client, auth_headers):
+    def test_compare(self, client: httpx.Client, auth_headers, neo4j_available):
         """人岗比对：差距三态 + 学习路径 + 证据引用。"""
         if not auth_headers:
             pytest.skip("admin 登录失败，跳过认证用例")
+        if not neo4j_available:
+            pytest.skip("Neo4j 不可达，跳过图谱依赖用例")
         resume_id = _get_resume_id(client, auth_headers)
         if not resume_id:
             pytest.skip("无简历缓存，跳过比对用例")
@@ -99,10 +102,12 @@ class TestResumeDetail:
 class TestMatchResultFlow:
     """匹配结果查询流程（需先有 recommend 结果）。"""
 
-    def test_recommend_and_query_result(self, client: httpx.Client, auth_headers):
+    def test_recommend_and_query_result(self, client: httpx.Client, auth_headers, neo4j_available):
         """推荐后查询匹配结果（链路通）。"""
         if not auth_headers:
             pytest.skip("admin 登录失败，跳过认证用例")
+        if not neo4j_available:
+            pytest.skip("Neo4j 不可达，跳过图谱依赖用例")
         resume_id = _get_resume_id(client, auth_headers)
         if not resume_id:
             pytest.skip("无简历缓存，跳过推荐用例")

@@ -1,7 +1,9 @@
 """演化模块集成测试（TE-M4-01，设计文档 §11.3.9）。
 
 覆盖 evolution 端点：diff/signals/versions 详情/trends/state-machine/watch。
-基础设施不可达时由 conftest 统一 skip。
+大部分端点从 graph_versions 快照（PostgreSQL）读取，不依赖 Neo4j；
+仅 test_position_evolution 调用 /graph/panorama 需 Neo4j。
+PG+Redis 不可达时由 conftest 统一 skip。
 """
 
 import httpx
@@ -111,10 +113,12 @@ class TestEvolutionWatch:
 class TestEvolutionPositionHistory:
     """岗位演化历史。"""
 
-    def test_position_evolution(self, client: httpx.Client, auth_headers):
+    def test_position_evolution(self, client: httpx.Client, auth_headers, neo4j_available):
         """岗位节点存在性与引用边数变化。"""
         if not auth_headers:
             pytest.skip("admin 登录失败，跳过认证用例")
+        if not neo4j_available:
+            pytest.skip("Neo4j 不可达，跳过图谱依赖用例")
         # 取一个真实岗位 ID
         pano = client.get(
             "/api/v1/graph/panorama", params={"limit": 50}, headers=auth_headers

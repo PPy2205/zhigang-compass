@@ -4,8 +4,9 @@
 以真实 uvicorn 子进程 + httpx 发起 HTTP 请求（规避 TestClient 与 asyncpg
 Proactor 事件环在 Windows 上的冲突，见 project_memory §3.4）。
 
-基础设施任一端口不可达 → 整体 skip（CI 无 DB 时集成测试自动跳过，
-不影响单元测试门禁；本地 docker compose up 后即可运行）。
+部分基础设施模式：PG+Redis 为最低要求（数据库 + 缓存），Neo4j 可选。
+PG/Redis 任一不可达 → 整体 skip；Neo4j 不可达 → 仅 skip 依赖图谱的用例
+（通过 neo4j_available 夹具控制），auth/admin/resume 等纯 PG 用例照常运行。
 """
 
 import socket
@@ -19,12 +20,10 @@ import pytest
 
 _BACKEND_DIR = Path(__file__).resolve().parents[2]
 
-# 本地基础设施端口（docker-compose 三件套）
-_INFRA_PORTS = [
-    ("127.0.0.1", 5432),   # postgres
-    ("127.0.0.1", 7687),   # neo4j bolt
-    ("127.0.0.1", 6379),   # redis
-]
+# 基础设施端口定义
+_PG_PORT = ("127.0.0.1", 5432)      # postgres
+_NEO4J_PORT = ("127.0.0.1", 7687)  # neo4j bolt
+_REDIS_PORT = ("127.0.0.1", 6379)  # redis
 
 
 def _port_open(host: str, port: int) -> bool:
@@ -33,8 +32,14 @@ def _port_open(host: str, port: int) -> bool:
         return s.connect_ex((host, port)) == 0
 
 
-def _infra_available() -> bool:
-    return all(_port_open(h, p) for h, p in _INFRA_PORTS)
+def _core_infra_available() -> bool:
+    """PG + Redis 为最低要求（数据库 + 缓存）。"""
+    return _port_open(*_PG_PORT) and _port_open(*_REDIS_PORT)
+
+
+def _neo4j_available() -> bool:
+    """Neo4j 可选：不可达时仅跳过依赖图谱的用例。"""
+    return _port_open(*_NEO4J_PORT)
 
 
 def _free_port() -> int:
@@ -45,10 +50,20 @@ def _free_port() -> int:
 
 
 @pytest.fixture(scope="session")
+def neo4j_available() -> bool:
+    """Neo4j 是否可用（session 级，供依赖图谱的用例条件 skip）。"""
+    return _neo4j_available()
+
+
+@pytest.fixture(scope="session")
 def base_url() -> str:
-    """启动真实 uvicorn 子进程，返回 base_url；基础设施不可达则 skip。"""
-    if not _infra_available():
-        pytest.skip("本地基础设施（postgres/neo4j/redis）不可达，跳过集成测试")
+    """启动真实 uvicorn 子进程，返回 base_url。
+
+    PG+Redis 不可达 → 整体 skip（CI 无 DB 时集成测试自动跳过）；
+    Neo4j 不可达时仍启动（app 图谱端点运行时 500，由各用例自行 skip）。
+    """
+    if not _core_infra_available():
+        pytest.skip("核心基础设施（postgres/redis）不可达，跳过集成测试")
 
     port = _free_port()
     proc = subprocess.Popen(

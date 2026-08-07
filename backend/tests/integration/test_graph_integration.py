@@ -7,11 +7,25 @@
 - 演化：versions 列表（真实 graph_versions 快照）
 - 简历：list（真实 resume_cache）
 
-基础设施不可达时由 conftest 统一 skip。链路中某数据源为空（如无技能先修）
-时用「链路通 + 结构合法」断言，不绑定固定数值，避免基础设施演化导致脆测。
+本文件全部用例依赖 Neo4j；Neo4j 不可达时模块级 skip（conftest 部分基础设施
+模式：PG+Redis 可用时 auth/admin 用例仍执行）。
+链路中某数据源为空（如无技能先修）时用「链路通 + 结构合法」断言，
+不绑定固定数值，避免基础设施演化导致脆测。
 """
 
+import socket
+
 import httpx
+import pytest
+
+
+def _neo4j_up() -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(1)
+        return s.connect_ex(("127.0.0.1", 7687)) == 0
+
+
+pytestmark = pytest.mark.skipif(not _neo4j_up(), reason="Neo4j 不可达，跳过图谱集成测试")
 
 
 class TestHealth:

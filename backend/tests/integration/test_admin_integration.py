@@ -91,10 +91,12 @@ class TestAdminPositions:
         r = client.get("/api/v1/admin/positions/declining", headers=auth_headers)
         assert r.status_code in (200, 403)
 
-    def test_position_detail(self, client: httpx.Client, auth_headers):
+    def test_position_detail(self, client: httpx.Client, auth_headers, neo4j_available):
         """岗位详情（技能/学历/证书）。"""
         if not auth_headers:
             pytest.skip("admin 登录失败，跳过认证用例")
+        if not neo4j_available:
+            pytest.skip("Neo4j 不可达，跳过图谱依赖用例")
         # 取一个真实岗位名
         pano = client.get(
             "/api/v1/graph/panorama", params={"limit": 50}, headers=auth_headers

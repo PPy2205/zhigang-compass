@@ -2,11 +2,22 @@
 
 覆盖 test_graph_integration.py 未覆盖的 graph 端点：
 position 详情/skills/evidence/similar/skill 详情/algorithms/view。
-基础设施不可达时由 conftest 统一 skip。
+本文件全部用例依赖 Neo4j；Neo4j 不可达时模块级 skip。
 """
+
+import socket
 
 import httpx
 import pytest
+
+
+def _neo4j_up() -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(1)
+        return s.connect_ex(("127.0.0.1", 7687)) == 0
+
+
+pytestmark = pytest.mark.skipif(not _neo4j_up(), reason="Neo4j 不可达，跳过图谱扩展集成测试")
 
 
 def _get_skill_id(client: httpx.Client, auth_headers) -> str | None:

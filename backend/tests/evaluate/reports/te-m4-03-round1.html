@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>准确率评测报告 - 2026-08-21 17:55:43</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               margin: 0; padding: 40px; background: #f5f5f5; color: #1f2937; }
+        h1 { margin-bottom: 8px; }
+        .subtitle { color: #6b7280; margin-bottom: 32px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+        h3 { color: #374151; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; font-size: 14px; }
+        th { background: #f9fafb; font-weight: 600; }
+        .badge { padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: 500; }
+        .pass { background: #dcfce7; color: #16a34a; }
+        .fail { background: #fee2e2; color: #dc2626; }
+        .skip { background: #f3f4f6; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <h1>智岗罗盘 · 准确率评测报告</h1>
+    <p class="subtitle">生成时间：2026-08-21 17:55:43 | 目标：JD/简历/匹配三项准确率均 ≥ 90%</p>
+    <div class="card">
+        <h2>总览</h2>
+        <table>
+            <tr><th>评测项</th><th>方法</th><th>样本数</th><th>核心指标</th><th>目标</th><th>状态</th></tr>
+            <tr><td>JD 解析</td><td>关键词基线（白名单匹配，无 LLM）</td><td>100</td><td>F1=0.6112</td><td>F1≥0.90</td><td><span class="badge fail">未达标</span></td></tr><tr><td>简历提取</td><td>关键词基线（白名单匹配，无 LLM）</td><td>50</td><td>F1=1.0000</td><td>F1≥0.90</td><td><span class="badge pass">达标</span></td></tr><tr><td>人岗匹配</td><td>规则匹配（无语义）</td><td>-</td><td>Spearman=0.8805<br>Accuracy=0.9600<br>Top-3=1.0000</td><td>Acc≥0.90</td><td><span class="badge pass">达标</span></td></tr>
+        </table>
+    </div>
+    
+        <div class="card">
+            <h2>JD 解析评测详情</h2>
+            <table>
+                <tr><th>Precision</th><th>Recall</th><th>F1</th><th>样本数</th><th>目标</th><th>状态</th></tr>
+                <tr><td>0.5316</td><td>0.7188</td><td>0.6112</td>
+                <td>100</td><td>F1≥0.90</td><td><span class="badge fail">未达标</span></td></tr>
+            </table>
+            <h3>混淆矩阵（多标签：TP / FP / FN）</h3>
+            <table>
+                <tr><th>True Positive</th><th>False Positive</th><th>False Negative</th></tr>
+                <tr><td>294</td><td>259</td><td>115</td></tr>
+            </table>
+            <h3>错误样例（前 5 条）</h3>
+            <table>
+                <tr><th>Source ID</th><th>误抽（FP）</th><th>漏抽（FN）</th></tr>
+                <tr><td>22c64d465b4b5d030nJ709u5F1tQ</td><td>go, sql</td><td>—</td></tr><tr><td>b5c789a748297d720nF93t20EFJQ</td><td>go, r, sql</td><td>—</td></tr><tr><td>ec6ac1027510acc90nF43N-1F1pW</td><td>c, go, linux, r, sql</td><td>linux开发/部署经验, 云计算经验, 分布式经验, 微服务经验, 机器学习经验</td></tr><tr><td>0abccfddcd8d22fa0nFz3t67EFZY</td><td>r, sql</td><td>了解python web, 熟悉sql</td></tr><tr><td>64c20a8f79891c230nFz2tu_F1pV</td><td>go, sql</td><td>—</td></tr>
+            </table>
+        </div>
+    
+        <div class="card">
+            <h2>简历提取评测详情</h2>
+            <table>
+                <tr><th>Precision</th><th>Recall</th><th>F1</th><th>样本数</th><th>目标</th><th>状态</th></tr>
+                <tr><td>1.0000</td><td>1.0000</td><td>1.0000</td>
+                <td>50</td><td>F1≥0.90</td><td><span class="badge pass">达标</span></td></tr>
+            </table>
+            <h3>混淆矩阵（多标签：TP / FP / FN）</h3>
+            <table>
+                <tr><th>True Positive</th><th>False Positive</th><th>False Negative</th></tr>
+                <tr><td>427</td><td>0</td><td>0</td></tr>
+            </table>
+        </div>
+    
+        <div class="card">
+            <h2>人岗匹配评测详情</h2>
+            <table>
+                <tr><th>Spearman</th><th>Accuracy</th><th>Top-3 推荐准确率</th><th>目标</th><th>状态</th></tr>
+                <tr><td>0.8805</td><td>0.9600</td><td>1.0000（19 个候选人）</td>
+                <td>Acc≥0.90</td><td><span class="badge pass">达标</span></td></tr>
+            </table>
+            <h3>混淆矩阵（二分类：阈值 0.5）</h3>
+            <table>
+                <tr><th></th><th>预测匹配</th><th>预测不匹配</th></tr>
+                <tr><th>实际匹配</th><td>100 (TP)</td><td>0 (FN)</td></tr>
+                <tr><th>实际不匹配</th><td>12 (FP)</td><td>188 (TN)</td></tr>
+            </table>
+            <h3>错误样例（前 5 条）</h3>
+            <table>
+                <tr><th>Position ID</th><th>系统评分</th><th>人工标注</th><th>错误类型</th></tr>
+                <tr><td>jd_005</td><td>0.5513</td><td>不匹配</td><td>FP</td></tr><tr><td>jd_028</td><td>1.0000</td><td>不匹配</td><td>FP</td></tr><tr><td>jd_032</td><td>0.5513</td><td>不匹配</td><td>FP</td></tr><tr><td>jd_032</td><td>0.5513</td><td>不匹配</td><td>FP</td></tr><tr><td>jd_037</td><td>0.5513</td><td>不匹配</td><td>FP</td></tr>
+            </table>
+        </div>
+</body>
+</html>

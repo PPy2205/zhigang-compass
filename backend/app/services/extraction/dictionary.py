@@ -126,6 +126,19 @@ SKILL_ALIAS: dict[str, str] = {
     # 工具
     "git": "Git",
     "jenkins": "Jenkins",
+    # T-08 新增：LLM 常见输出 + BOSS 标签归一化
+    "大模型ai": "大语言模型",
+    "大模型应用": "大语言模型",
+    "大模型开发": "大语言模型",
+    "大数据处理": "数据治理",
+    "分布式系统": "Microservices",
+    "分布式架构": "Microservices",
+    "微服务": "Microservices",
+    "微服务架构": "Microservices",
+    "微服务架构设计": "Microservices",
+    "算法工程化": "大模型算法",
+    "react native": "React Native",
+    "python web": "Python",
 }
 
 # 软技能白名单（岗位本体维护，共 20 项，设计文档 9.2 节）。

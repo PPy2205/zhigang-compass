@@ -1,0 +1,272 @@
+[
+  {
+    "task": "jd",
+    "round": "R1 基线",
+    "method": "关键词白名单匹配（无 LLM）",
+    "samples": 100,
+    "precision": 0.5316,
+    "recall": 0.7188,
+    "f1": 0.6112,
+    "target_f1": 0.9,
+    "target_met": false,
+    "confusion": {
+      "tp": 294,
+      "fp": 259,
+      "fn": 115
+    },
+    "error_cases": [
+      {
+        "source_id": "22c64d465b4b5d030nJ709u5F1tQ",
+        "false_positives": [
+          "go",
+          "sql"
+        ],
+        "false_negatives": []
+      },
+      {
+        "source_id": "b5c789a748297d720nF93t20EFJQ",
+        "false_positives": [
+          "go",
+          "r",
+          "sql"
+        ],
+        "false_negatives": []
+      },
+      {
+        "source_id": "ec6ac1027510acc90nF43N-1F1pW",
+        "false_positives": [
+          "c",
+          "go",
+          "linux",
+          "r",
+          "sql"
+        ],
+        "false_negatives": [
+          "linux开发/部署经验",
+          "云计算经验",
+          "分布式经验",
+          "微服务经验",
+          "机器学习经验"
+        ]
+      }
+    ]
+  },
+  {
+    "task": "resume",
+    "round": "R1 基线",
+    "method": "关键词白名单匹配（无 LLM）",
+    "samples": 50,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "target_f1": 0.9,
+    "target_met": true,
+    "confusion": {
+      "tp": 427,
+      "fp": 0,
+      "fn": 0
+    },
+    "note": "黄金集全为合成数据，基线 F1=1.0 无对比意义"
+  },
+  {
+    "task": "match",
+    "skipped": false,
+    "method": "规则匹配（无语义）",
+    "spearman": 0.8805,
+    "accuracy": 0.96,
+    "target_accuracy": 0.9,
+    "target_met": true,
+    "top3_accuracy": 1.0,
+    "top3_samples": 19,
+    "confusion": {
+      "tp": 100,
+      "fp": 12,
+      "tn": 188,
+      "fn": 0
+    },
+    "error_cases": [
+      {
+        "position_id": "jd_005",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_028",
+        "score": 1.0,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_032",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_032",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_037",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      }
+    ],
+    "round": "R1 基线"
+  },
+  {
+    "task": "jd",
+    "skipped": false,
+    "method": "真实 LLM 抽取（JDExtractor + 规则兜底）",
+    "samples": 100,
+    "skipped_samples": 0,
+    "errors": 0,
+    "precision": 0.8363,
+    "recall": 0.8117,
+    "f1": 0.8238,
+    "target_f1": 0.9,
+    "target_met": false,
+    "confusion": {
+      "tp": 332,
+      "fp": 65,
+      "fn": 77
+    },
+    "error_cases": [
+      {
+        "source_id": "ec6ac1027510acc90nF43N-1F1pW",
+        "false_positives": [
+          "linux",
+          "云计算",
+          "分布式",
+          "微服务",
+          "机器学习"
+        ],
+        "false_negatives": [
+          "linux开发/部署经验",
+          "云计算经验",
+          "分布式经验",
+          "微服务经验",
+          "机器学习经验"
+        ]
+      },
+      {
+        "source_id": "0abccfddcd8d22fa0nFz3t67EFZY",
+        "false_positives": [
+          "python web",
+          "sql"
+        ],
+        "false_negatives": [
+          "了解python web",
+          "熟悉sql"
+        ]
+      },
+      {
+        "source_id": "4cecf3e5f25a69f703Zz09m-FFNS",
+        "false_positives": [
+          "机器学习"
+        ],
+        "false_negatives": [
+          "其他",
+          "机器学习经验"
+        ]
+      },
+      {
+        "source_id": "52e2181e545b10101Hx82ti-EltU",
+        "false_positives": [],
+        "false_negatives": [
+          "其他",
+          "广告"
+        ]
+      },
+      {
+        "source_id": "d5c7c9a54364b5d90nZ42di-EFdW",
+        "false_positives": [
+          "大数据处理",
+          "大模型ai",
+          "算法工程化"
+        ],
+        "false_negatives": [
+          "优秀开源项目经历",
+          "其他",
+          "参加算法相关竞赛/获奖",
+          "发表算法相关优秀论文",
+          "团队管理经验"
+        ]
+      }
+    ],
+    "round": "R2 LLM"
+  },
+  {
+    "task": "resume",
+    "skipped": false,
+    "method": "真实 LLM 抽取（ResumeExtractor + 规则兜底）",
+    "samples": 50,
+    "skipped_samples": 0,
+    "errors": 0,
+    "precision": 0.8966,
+    "recall": 0.9742,
+    "f1": 0.9338,
+    "target_f1": 0.9,
+    "target_met": true,
+    "confusion": {
+      "tp": 416,
+      "fp": 48,
+      "fn": 11
+    },
+    "round": "R2 LLM"
+  },
+  {
+    "task": "match",
+    "skipped": false,
+    "method": "规则 + SBERT 语义增强",
+    "spearman": 0.8808,
+    "accuracy": 0.96,
+    "target_accuracy": 0.9,
+    "target_met": true,
+    "top3_accuracy": 1.0,
+    "top3_samples": 19,
+    "confusion": {
+      "tp": 100,
+      "fp": 12,
+      "tn": 188,
+      "fn": 0
+    },
+    "error_cases": [
+      {
+        "position_id": "jd_005",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_028",
+        "score": 1.0,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_032",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_032",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_037",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      }
+    ],
+    "round": "R2 语义增强"
+  }
+]

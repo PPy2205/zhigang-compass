@@ -1,0 +1,18 @@
+{
+  "task": "resume",
+  "skipped": false,
+  "method": "真实 LLM 抽取（ResumeExtractor + 规则兜底）",
+  "samples": 50,
+  "skipped_samples": 0,
+  "errors": 0,
+  "precision": 0.8966,
+  "recall": 0.9742,
+  "f1": 0.9338,
+  "target_f1": 0.9,
+  "target_met": true,
+  "confusion": {
+    "tp": 416,
+    "fp": 48,
+    "fn": 11
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "task": "jd",
+  "skipped": false,
+  "method": "真实 LLM 抽取（JDExtractor + 规则兜底）",
+  "samples": 100,
+  "skipped_samples": 0,
+  "errors": 0,
+  "precision": 0.8363,
+  "recall": 0.8117,
+  "f1": 0.8238,
+  "target_f1": 0.9,
+  "target_met": false,
+  "confusion": {
+    "tp": 332,
+    "fp": 65,
+    "fn": 77
+  },
+  "error_cases": [
+    {
+      "source_id": "ec6ac1027510acc90nF43N-1F1pW",
+      "false_positives": [
+        "linux",
+        "云计算",
+        "分布式",
+        "微服务",
+        "机器学习"
+      ],
+      "false_negatives": [
+        "linux开发/部署经验",
+        "云计算经验",
+        "分布式经验",
+        "微服务经验",
+        "机器学习经验"
+      ]
+    },
+    {
+      "source_id": "0abccfddcd8d22fa0nFz3t67EFZY",
+      "false_positives": [
+        "python web",
+        "sql"
+      ],
+      "false_negatives": [
+        "了解python web",
+        "熟悉sql"
+      ]
+    },
+    {
+      "source_id": "4cecf3e5f25a69f703Zz09m-FFNS",
+      "false_positives": [
+        "机器学习"
+      ],
+      "false_negatives": [
+        "其他",
+        "机器学习经验"
+      ]
+    },
+    {
+      "source_id": "52e2181e545b10101Hx82ti-EltU",
+      "false_positives": [],
+      "false_negatives": [
+        "其他",
+        "广告"
+      ]
+    },
+    {
+      "source_id": "d5c7c9a54364b5d90nZ42di-EFdW",
+      "false_positives": [
+        "大数据处理",
+        "大模型ai",
+        "算法工程化"
+      ],
+      "false_negatives": [
+        "优秀开源项目经历",
+        "其他",
+        "参加算法相关竞赛/获奖",
+        "发表算法相关优秀论文",
+        "团队管理经验"
+      ]
+    }
+  ]
+}

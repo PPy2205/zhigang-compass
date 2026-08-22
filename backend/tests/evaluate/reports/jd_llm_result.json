@@ -2,33 +2,31 @@
   "task": "jd",
   "skipped": false,
   "method": "真实 LLM 抽取（JDExtractor + 规则兜底）",
-  "samples": 100,
-  "skipped_samples": 0,
+  "samples": 96,
+  "skipped_samples": 4,
   "errors": 0,
-  "precision": 0.88,
-  "recall": 0.8756,
-  "f1": 0.8778,
+  "precision": 0.8769,
+  "recall": 0.886,
+  "f1": 0.8814,
   "target_f1": 0.9,
   "target_met": false,
   "confusion": {
-    "tp": 352,
+    "tp": 342,
     "fp": 48,
-    "fn": 50
+    "fn": 44
   },
   "error_cases": [
     {
       "source_id": "4cecf3e5f25a69f703Zz09m-FFNS",
       "false_positives": [],
       "false_negatives": [
-        "docker",
-        "其他"
+        "docker"
       ]
     },
     {
       "source_id": "52e2181e545b10101Hx82ti-EltU",
       "false_positives": [],
       "false_negatives": [
-        "其他",
         "广告"
       ]
     },
@@ -40,24 +38,23 @@
       ],
       "false_negatives": [
         "hadoop",
-        "优秀开源",
-        "其他",
-        "参加算法相关竞赛/获奖",
-        "发表算法相关优秀论文"
+        "大模型 ai",
+        "大模型算法"
       ]
     },
     {
-      "source_id": "ca5a8bba6ccb41e10nJ609m7GFRR",
-      "false_positives": [],
-      "false_negatives": [
-        "1年以内"
-      ]
+      "source_id": "CCL1480117890J40845576605",
+      "false_positives": [
+        "前端",
+        "后端"
+      ],
+      "false_negatives": []
     },
     {
-      "source_id": "92cd12dfcd59e9ed0nJ42ty7FVdX",
+      "source_id": "CC192921310J40831468409",
       "false_positives": [],
       "false_negatives": [
-        "在校/应届"
+        "数据"
       ]
     }
   ]

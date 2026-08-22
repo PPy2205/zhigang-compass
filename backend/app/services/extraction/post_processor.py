@@ -21,11 +21,13 @@ from app.services.extraction.dictionary import (
 # （如"微服务经验""机器学习经历"），递归剥除至白名单可匹配。
 SUFFIXES = sorted([
     "工程师", "技术", "系统", "框架", "平台", "工具", "软件", "开发",
-    "设计", "管理", "应用", "方案", "产品", "项目", "算法",
+    "设计", "管理", "应用", "方案", "产品", "项目",
     "架构", "引擎", "组件", "中间件", "协议", "标准", "接口",
     # T-08 新增：经验/能力/知识等后缀（BOSS 标签 + LLM 输出常见）
     "经验", "经历", "实践", "能力", "知识", "原理",
     "工程", "体系", "体系结构", "程序", "语言",
+    # T-08 注：不含"算法"——"图像算法""推荐算法""风控算法"等是完整技能名，
+    # 剥除后产生碎片"图像""推荐""风控"无法对齐白名单
 ], key=len, reverse=True)
 
 _SKILL_SUFFIX_RE = re.compile(
@@ -79,12 +81,19 @@ def _align_to_whitelist(name: str) -> str:
             best_std = skill
     if best_match:
         return best_std
-    # 输入是白名单词的前缀子串（输入更短，至少 3 字符）
+    # 输入是白名单词的前缀子串（输入更短）
+    # 中文 2 字符即可匹配（图像→图像算法），英文要求 ≥ 3 防短词误匹配
+    min_prefix_len = 2 if _is_cjk(low) else 3
     for skill in SKILL_WHITELIST:
         sl = skill.lower()
-        if len(low) >= 3 and low == sl[:len(low)]:
+        if len(low) >= min_prefix_len and low == sl[:len(low)]:
             return skill
     return name
+
+
+def _is_cjk(s: str) -> bool:
+    """判断字符串是否含 CJK 字符（用于降低中文前缀对齐的最小长度阈值）。"""
+    return any('\u4e00' <= ch <= '\u9fff' for ch in s)
 
 
 def clean_skill_name(name: str) -> str:

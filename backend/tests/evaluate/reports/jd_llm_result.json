@@ -5,53 +5,23 @@
   "samples": 100,
   "skipped_samples": 0,
   "errors": 0,
-  "precision": 0.8363,
-  "recall": 0.8117,
-  "f1": 0.8238,
+  "precision": 0.88,
+  "recall": 0.8756,
+  "f1": 0.8778,
   "target_f1": 0.9,
   "target_met": false,
   "confusion": {
-    "tp": 332,
-    "fp": 65,
-    "fn": 77
+    "tp": 352,
+    "fp": 48,
+    "fn": 50
   },
   "error_cases": [
     {
-      "source_id": "ec6ac1027510acc90nF43N-1F1pW",
-      "false_positives": [
-        "linux",
-        "云计算",
-        "分布式",
-        "微服务",
-        "机器学习"
-      ],
-      "false_negatives": [
-        "linux开发/部署经验",
-        "云计算经验",
-        "分布式经验",
-        "微服务经验",
-        "机器学习经验"
-      ]
-    },
-    {
-      "source_id": "0abccfddcd8d22fa0nFz3t67EFZY",
-      "false_positives": [
-        "python web",
-        "sql"
-      ],
-      "false_negatives": [
-        "了解python web",
-        "熟悉sql"
-      ]
-    },
-    {
       "source_id": "4cecf3e5f25a69f703Zz09m-FFNS",
-      "false_positives": [
-        "机器学习"
-      ],
+      "false_positives": [],
       "false_negatives": [
-        "其他",
-        "机器学习经验"
+        "docker",
+        "其他"
       ]
     },
     {
@@ -65,16 +35,29 @@
     {
       "source_id": "d5c7c9a54364b5d90nZ42di-EFdW",
       "false_positives": [
-        "大数据处理",
-        "大模型ai",
-        "算法工程化"
+        "大数据",
+        "大语言模型"
       ],
       "false_negatives": [
-        "优秀开源项目经历",
+        "hadoop",
+        "优秀开源",
         "其他",
         "参加算法相关竞赛/获奖",
-        "发表算法相关优秀论文",
-        "团队管理经验"
+        "发表算法相关优秀论文"
+      ]
+    },
+    {
+      "source_id": "ca5a8bba6ccb41e10nJ609m7GFRR",
+      "false_positives": [],
+      "false_negatives": [
+        "1年以内"
+      ]
+    },
+    {
+      "source_id": "92cd12dfcd59e9ed0nJ42ty7FVdX",
+      "false_positives": [],
+      "false_negatives": [
+        "在校/应届"
       ]
     }
   ]

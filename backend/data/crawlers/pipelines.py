@@ -1,8 +1,14 @@
 """Scrapy Pipeline：数据清洗与入库路由。
 
-链路：Item → CleaningPipeline(去重指纹+脱敏+文本标准化)
+链路（设计文档 §4.2）：
+    Item → CleaningPipeline(长度过滤→核心词检测→质量评分→去重指纹
+         +脱敏+SimHash+MinHash兜底+文本标准化)
     → PostgresPipeline(upsert 到 raw 表)
     → [后续] LLM 抽取服务消费 raw 表 → 图谱写入服务 → Neo4j
+
+ETL 完整编排见 workers/tasks.py run_etl_pipeline（§4.4）：
+    crawl_jds → clean_jds(本文件) → dedup → validate_temporal
+    → detect_inflation → structure → load_to_db → load_to_neo4j
 """
 
 import hashlib
@@ -36,6 +42,78 @@ _EMPLOYMENT_INTERN_CN = "实习"    # 含"实习生"
 _EMPLOYMENT_PARTTIME_CN = "兼职"
 
 
+# ── 核心词检测（设计文档 §4.2：核心词检测）──
+# JD 文本中至少包含一个核心词，否则视为无效内容丢弃
+_CORE_KEYWORDS = {
+    # 中文核心词
+    "职责", "要求", "任职", "经验", "学历", "技能", "熟悉", "精通",
+    "掌握", "负责", "岗位", "招聘", "薪资", "福利", "本科", "硕士",
+    "大专", "开发", "工程师", "分析师", "产品经理", "设计", "运维",
+    "架构", "测试", "数据", "算法", "前端", "后端", "全栈",
+    # 英文核心词
+    "responsib", "require", "experience", "skill", "familiar",
+    "proficient", "bachelor", "master", "degree", "develop",
+    "engineer", "analyst", "design", "architect", "test",
+}
+
+
+def _has_core_keyword(text: str) -> bool:
+    """检查文本是否包含至少一个核心词。"""
+    text_lower = text.lower()
+    for kw in _CORE_KEYWORDS:
+        if kw in text_lower:
+            return True
+    return False
+
+
+# ── 质量评分（设计文档 §4.2：质量评分）──
+# 字段完整度(0.3) + 文本长度(0.2) + 核心词(0.3) + 格式规范(0.2)
+# < 0.6 标记为需要人工复核（不丢弃，标记 needs_review）
+QUALITY_THRESHOLD = 0.6
+
+# 期望字段（JobItem 质量评估用）
+_QUALITY_FIELDS = ("title", "company", "description", "requirements", "location", "salary")
+
+
+def _quality_score(item) -> float:
+    """计算 JD 质量评分（0.0-1.0）。
+
+    四维加权：
+    - 字段完整度 0.3：6 个核心字段中非空比例
+    - 文本长度 0.2：description >= 200 字满分，>= 100 半分
+    - 核心词 0.3：包含核心词 0.3，不包含 0
+    - 格式规范 0.2：有段落/列表标记 0.2，纯无格式文本 0
+    """
+    # 1. 字段完整度（0.3）
+    filled = sum(1 for f in _QUALITY_FIELDS if item.get(f))
+    completeness = filled / len(_QUALITY_FIELDS) * 0.3
+
+    # 2. 文本长度（0.2）
+    desc = item.get("description") or ""
+    req = item.get("requirements") or ""
+    total_len = len(desc) + len(req)
+    if total_len >= 200:
+        length_score = 0.2
+    elif total_len >= 100:
+        length_score = 0.1
+    else:
+        length_score = 0.0
+
+    # 3. 核心词（0.3）
+    combined_text = " ".join(filter(None, [
+        item.get("title", ""), desc, req,
+        item.get("raw_text", ""),
+    ]))
+    keyword_score = 0.3 if _has_core_keyword(combined_text) else 0.0
+
+    # 4. 格式规范（0.2）
+    format_score = 0.0
+    if any(marker in combined_text for marker in ("\n", "•", "-", "1.", "2.", "、", "；", "：")):
+        format_score = 0.2
+
+    return round(completeness + length_score + keyword_score + format_score, 4)
+
+
 def _employment_reason(item) -> str | None:
     """实习/兼职岗位的拦截原因；未命中返回 None。
 
@@ -61,7 +139,14 @@ def _employment_reason(item) -> str | None:
 
 
 class CleaningPipeline:
-    """基础清洗：去重指纹 + 文本标准化 + 脱敏标记 + 实习/兼职岗位源头过滤。"""
+    """基础清洗：长度过滤→核心词检测→质量评分→去重指纹+脱敏+SimHash+文本标准化。
+
+    管线顺序对齐设计文档 §4.2：
+        raw_JD → 长度过滤 → 核心词检测 → 质量评分 → 去重 → 时效加权 → 结构化输出
+
+    本 Pipeline 负责 长度过滤→核心词检测→质量评分→去重指纹+SimHash+文本标准化，
+    时效加权与精确去重由后续 ARQ 任务（validate_temporal / dedup_simhash）处理。
+    """
 
     # 边界 (?<!\d)/(?!\d) 防止误伤长数字 ID（如 19 位 source_id）中的子串
     PII_PATTERNS = [
@@ -69,6 +154,9 @@ class CleaningPipeline:
         (re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)"), "PHONE"),
         (re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"), "EMAIL"),
     ]
+
+    # 长度过滤阈值（设计文档 §4.2：长度 < 50 字丢弃）
+    MIN_TEXT_LENGTH = 50
 
     def __init__(self):
         self.crawler = None
@@ -101,6 +189,59 @@ class CleaningPipeline:
                         item.get("company", ""),
                     )
                 raise DropItem(f"{reason}: {item.get('title', '')}")
+
+        # ── 长度过滤（设计文档 §4.2：长度 < 50 字丢弃）──
+        if isinstance(item, JobItem):
+            text_for_length = " ".join(filter(None, [
+                item.get("description", ""),
+                item.get("requirements", ""),
+                item.get("raw_text", ""),
+            ]))
+            if len(text_for_length.strip()) < self.MIN_TEXT_LENGTH:
+                spider = self._spider()
+                if spider:
+                    spider.logger.info(
+                        "[长度过滤] 丢弃过短 JD source=%s title=%r len=%d",
+                        item.get("source", ""),
+                        item.get("title", ""),
+                        len(text_for_length.strip()),
+                    )
+                raise DropItem(f"文本过短（{len(text_for_length.strip())} < {self.MIN_TEXT_LENGTH}）")
+
+        # ── 核心词检测（设计文档 §4.2：核心词检测）──
+        if isinstance(item, JobItem):
+            combined_text = " ".join(filter(None, [
+                item.get("title", ""),
+                item.get("description", ""),
+                item.get("requirements", ""),
+                item.get("raw_text", ""),
+            ]))
+            if not _has_core_keyword(combined_text):
+                spider = self._spider()
+                if spider:
+                    spider.logger.info(
+                        "[核心词检测] 丢弃无核心词 JD source=%s title=%r",
+                        item.get("source", ""),
+                        item.get("title", ""),
+                    )
+                raise DropItem("未检测到 JD 核心词")
+
+        # ── 质量评分（设计文档 §4.2：质量评分 < 0.6 入人工复核）──
+        if isinstance(item, JobItem):
+            score = _quality_score(item)
+            item["quality_score"] = score
+            if score < QUALITY_THRESHOLD:
+                item["needs_review"] = True
+                spider = self._spider()
+                if spider:
+                    spider.logger.info(
+                        "[质量评分] 低质量 JD score=%.4f source=%s title=%r",
+                        score,
+                        item.get("source", ""),
+                        item.get("title", ""),
+                    )
+            else:
+                item["needs_review"] = False
 
         # 去重指纹：source + source_id 的 SHA256；source_id 缺失时回退 source_url
         # （避免不同记录指纹相同且按 (source, source_id) upsert 互相覆盖）

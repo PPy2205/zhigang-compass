@@ -39,6 +39,13 @@ class Settings(BaseSettings):
     admin_username: str = "admin"
     admin_password: str = "admin123"
 
+    # ---------- 连接池 ----------
+    pg_pool_size: int = 20          # PostgreSQL 连接池基础大小
+    pg_max_overflow: int = 30       # PostgreSQL 连接池溢出上限
+    pg_pool_recycle: int = 3600     # PostgreSQL 连接回收周期（秒）
+    neo4j_max_pool: int = 50        # Neo4j 最大连接数
+    redis_max_conn: int = 50        # Redis 最大连接数
+
     # ---------- 缓存 ----------
     panorama_cache_ttl: int = 30  # 秒
 

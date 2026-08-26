@@ -1,0 +1,61 @@
+{
+  "task": "jd",
+  "skipped": false,
+  "method": "真实 LLM 抽取（JDExtractor + 规则兜底）",
+  "samples": 96,
+  "skipped_samples": 4,
+  "errors": 0,
+  "precision": 0.8769,
+  "recall": 0.886,
+  "f1": 0.8814,
+  "target_f1": 0.9,
+  "target_met": false,
+  "confusion": {
+    "tp": 342,
+    "fp": 48,
+    "fn": 44
+  },
+  "error_cases": [
+    {
+      "source_id": "4cecf3e5f25a69f703Zz09m-FFNS",
+      "false_positives": [],
+      "false_negatives": [
+        "docker"
+      ]
+    },
+    {
+      "source_id": "52e2181e545b10101Hx82ti-EltU",
+      "false_positives": [],
+      "false_negatives": [
+        "广告"
+      ]
+    },
+    {
+      "source_id": "d5c7c9a54364b5d90nZ42di-EFdW",
+      "false_positives": [
+        "大数据",
+        "大语言模型"
+      ],
+      "false_negatives": [
+        "hadoop",
+        "大模型 ai",
+        "大模型算法"
+      ]
+    },
+    {
+      "source_id": "CCL1480117890J40845576605",
+      "false_positives": [
+        "前端",
+        "后端"
+      ],
+      "false_negatives": []
+    },
+    {
+      "source_id": "CC192921310J40831468409",
+      "false_positives": [],
+      "false_negatives": [
+        "数据"
+      ]
+    }
+  ]
+}

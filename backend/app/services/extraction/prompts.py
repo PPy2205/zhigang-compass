@@ -13,9 +13,10 @@ TASK_TEMPLATE = """从以下 JD 文本中提取信息，以 JSON 格式输出。
 1. 岗位（position_name）：使用中文标准岗位名（如"前端开发工程师"），英文岗位名必须
    翻译为中文（如 "Software Engineer" → "软件工程师"）；不包含公司名/部门/团队名称，
    禁止使用"技术"、"开发"、"工程师"等泛词（如"技术/后台"不入图）
-2. 技能（skills）：仅列出技术技能（如"Python"、"Java"、"数据分析"）。禁止把行业、
+2. 技能（skills）：仅列出具体技术技能（如"Python"、"Java"、"数据分析"）。禁止把行业、
    业务领域、招聘福利词列为技能（如保险/金融/银行/电商/医疗/教育/物流/车联网/
-   五险一金/社保/公积金/双休/年终奖等）
+   五险一金/社保/公积金/双休/年终奖等）。禁止把岗位类别/泛词列为技能（如"后端"、
+   "前端"、"全栈"、"前端工程化"、"工程类"等，应抽取其具体技术如"Webpack"、"Vite"）
 3. 工具（tools）：列出框架/工具，如"Spring Boot"、"Kubernetes"
 4. 教育（education）：学历要求和专业要求
 5. 证书（certifications）：需要的认证
@@ -44,8 +45,8 @@ JD 文本：招聘资深数据仓库工程师，精通 SQL 与 Hive，熟练使�
 输出：{{"position_name": "数据仓库工程师", "level": "资深", "skills": [{{"name": "SQL"}}, {{"name": "Hive"}}, {{"name": "Spark"}}, {{"name": "Airflow"}}, {{"name": "数据建模"}}], "tools": [], "education": {{"level": "本科", "major": "计算机"}}, "certifications": [{{"name": "AWS 数据类认证"}}], "requirements": [{{"skill_name": "SQL", "necessity": "must", "level": "高级"}}, {{"skill_name": "Hive", "necessity": "must", "level": "高级"}}, {{"skill_name": "Spark", "necessity": "must", "level": "中级"}}, {{"skill_name": "Airflow", "necessity": "must"}}, {{"skill_name": "数据建模", "necessity": "must"}}]}}
 
 示例 4：
-JD 文本：招聘前端开发工程师，精通 React 与 TypeScript，掌握前端工程化，熟练使用 ECharts 做数据可视化，大专以上学历，具备良好的团队协作与沟通能力
-输出：{{"position_name": "前端开发工程师", "skills": [{{"name": "React"}}, {{"name": "TypeScript"}}, {{"name": "前端工程化"}}, {{"name": "ECharts"}}, {{"name": "数据可视化"}}], "tools": [], "education": {{"level": "大专"}}, "soft_skills": ["团队协作", "沟通能力"], "requirements": [{{"skill_name": "React", "necessity": "must", "level": "高级"}}, {{"skill_name": "TypeScript", "necessity": "must", "level": "高级"}}, {{"skill_name": "ECharts", "necessity": "nice"}}]}}
+JD 文本：招聘前端开发工程师，精通 React 与 TypeScript，掌握 Webpack 与 Vite 做前端工程化，熟练使用 ECharts 做数据可视化，大专以上学历，具备良好的团队协作与沟通能力
+输出：{{"position_name": "前端开发工程师", "skills": [{{"name": "React"}}, {{"name": "TypeScript"}}, {{"name": "Webpack"}}, {{"name": "Vite"}}, {{"name": "ECharts"}}, {{"name": "数据可视化"}}], "tools": [], "education": {{"level": "大专"}}, "soft_skills": ["团队协作", "沟通能力"], "requirements": [{{"skill_name": "React", "necessity": "must", "level": "高级"}}, {{"skill_name": "TypeScript", "necessity": "must", "level": "高级"}}, {{"skill_name": "ECharts", "necessity": "nice"}}]}}
 
 示例 5：
 JD 文本：招聘网络安全工程师，负责渗透测试与安全运维，熟悉 Linux 与 Python，1-3 年经验，本科及以上学历，持有 CISP 或 OSCP 证书者优先
@@ -58,9 +59,10 @@ BATCH_TASK_TEMPLATE = """从以下 {jd_count} 条 JD 文本中提取信息，输
 1. 岗位（position_name）：使用中文标准岗位名（如"前端开发工程师"），英文岗位名必须
    翻译为中文（如 "Software Engineer" → "软件工程师"）；不包含公司名/部门/团队名称，
    禁止使用"技术"、"开发"、"工程师"等泛词（如"技术/后台"不入图）
-2. 技能（skills）：仅列出技术技能（如"Python"、"Java"、"数据分析"）。禁止把行业、
+2. 技能（skills）：仅列出具体技术技能（如"Python"、"Java"、"数据分析"）。禁止把行业、
    业务领域、招聘福利词列为技能（如保险/金融/银行/电商/医疗/教育/物流/车联网/
-   五险一金/社保/公积金/双休/年终奖等）
+   五险一金/社保/公积金/双休/年终奖等）。禁止把岗位类别/泛词列为技能（如"后端"、
+   "前端"、"全栈"、"前端工程化"、"工程类"等，应抽取其具体技术如"Webpack"、"Vite"）
 3. 工具（tools）：列出框架/工具，如"Spring Boot"、"Kubernetes"
 4. 教育（education）：学历要求和专业要求
 5. 证书（certifications）：需要的认证

@@ -140,8 +140,14 @@ async def fulltext_search(
     """Neo4j 全文检索（cjk 分词器，设计文档 5.4）。
 
     position/skill 走全文索引；evidence 走 evidence_search 全文索引
-    （M17 新增，索引缺失时降级 CONTAINS）。
+    （M17 新增，索引缺失时降级 CONTAINS）。30s Redis 缓存减少重复查询压力。
     """
+    # 搜索结果缓存（30s TTL，与全景图同档；高频搜索词命中率极高）
+    cache_key = f"graph:search:{type_}:{q}:{page}:{size}"
+    cached = await _cache_get(cache_key)
+    if cached is not None:
+        return ok(data=cached)
+
     offset = (page - 1) * size
     items: list[dict] = []
     total = 0
@@ -209,7 +215,9 @@ async def fulltext_search(
             for rec in result
         ]
 
-    return ok(data={"items": items, "total": total, "page": page, "size": size})
+    data = {"items": items, "total": total, "page": page, "size": size}
+    await _cache_set(cache_key, data, ttl=30)
+    return ok(data=data)
 
 
 def _load_skill(skill_id: str) -> dict | None:
@@ -345,7 +353,11 @@ async def position_skills(
     necessity: Optional[Literal["must", "nice"]] = Query(default=None),
     user: dict = Depends(require_role("guest")),
 ):
-    """[M4] 岗位技能列表（可按 necessity 过滤）。"""
+    """[M4] 岗位技能列表（可按 necessity 过滤）。5min Redis 缓存。"""
+    cache_key = f"graph:position:{id}:skills:{necessity or 'all'}"
+    cached = await _cache_get(cache_key)
+    if cached is not None:
+        return ok(data=cached)
     if _load_position(id) is None:
         return error(4040, "岗位不存在", http_status=404)
 
@@ -371,7 +383,9 @@ async def position_skills(
             for rec in rows
         ]
 
-    return ok(data={"position_id": id, "skills": items})
+    data = {"position_id": id, "skills": items}
+    await _cache_set(cache_key, data)
+    return ok(data=data)
 
 
 @router.get("/skill/{skill_id}/evidence")

@@ -1,0 +1,139 @@
+[
+  {
+    "task": "jd",
+    "skipped": false,
+    "method": "关键词基线（白名单匹配，无 LLM）",
+    "samples": 100,
+    "precision": 0.5316,
+    "recall": 0.7188,
+    "f1": 0.6112,
+    "target_f1": 0.9,
+    "target_met": false,
+    "confusion": {
+      "tp": 294,
+      "fp": 259,
+      "fn": 115
+    },
+    "error_cases": [
+      {
+        "source_id": "22c64d465b4b5d030nJ709u5F1tQ",
+        "false_positives": [
+          "go",
+          "sql"
+        ],
+        "false_negatives": []
+      },
+      {
+        "source_id": "b5c789a748297d720nF93t20EFJQ",
+        "false_positives": [
+          "go",
+          "r",
+          "sql"
+        ],
+        "false_negatives": []
+      },
+      {
+        "source_id": "ec6ac1027510acc90nF43N-1F1pW",
+        "false_positives": [
+          "c",
+          "go",
+          "linux",
+          "r",
+          "sql"
+        ],
+        "false_negatives": [
+          "linux开发/部署经验",
+          "云计算经验",
+          "分布式经验",
+          "微服务经验",
+          "机器学习经验"
+        ]
+      },
+      {
+        "source_id": "0abccfddcd8d22fa0nFz3t67EFZY",
+        "false_positives": [
+          "r",
+          "sql"
+        ],
+        "false_negatives": [
+          "了解python web",
+          "熟悉sql"
+        ]
+      },
+      {
+        "source_id": "64c20a8f79891c230nFz2tu_F1pV",
+        "false_positives": [
+          "go",
+          "sql"
+        ],
+        "false_negatives": []
+      }
+    ]
+  },
+  {
+    "task": "resume",
+    "skipped": false,
+    "method": "关键词基线（白名单匹配，无 LLM）",
+    "samples": 50,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "target_f1": 0.9,
+    "target_met": true,
+    "confusion": {
+      "tp": 427,
+      "fp": 0,
+      "fn": 0
+    },
+    "error_cases": []
+  },
+  {
+    "task": "match",
+    "skipped": false,
+    "method": "规则匹配（无语义）",
+    "spearman": 0.8805,
+    "accuracy": 0.96,
+    "target_accuracy": 0.9,
+    "target_met": true,
+    "top3_accuracy": 1.0,
+    "top3_samples": 19,
+    "confusion": {
+      "tp": 100,
+      "fp": 12,
+      "tn": 188,
+      "fn": 0
+    },
+    "error_cases": [
+      {
+        "position_id": "jd_005",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_028",
+        "score": 1.0,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_032",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_032",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      },
+      {
+        "position_id": "jd_037",
+        "score": 0.5513,
+        "label": 0,
+        "error_type": "FP"
+      }
+    ]
+  }
+]

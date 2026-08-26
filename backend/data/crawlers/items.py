@@ -42,6 +42,10 @@ class JobItem(_BaseItem):
     post_date = Field()         # 发布日期
     tags = Field()              # 平台标签列表
 
+    # ---- 质量评估（设计文档 §4.2：质量评分）----
+    quality_score = Field()     # 质量评分（0.0-1.0），由 CleaningPipeline 计算
+    needs_review = Field()      # 质量评分 < 0.6 时标记为 True，入人工复核队列
+
 
 class CourseItem(_BaseItem):
     """课程信息（icourse163 / coursera / edx）。

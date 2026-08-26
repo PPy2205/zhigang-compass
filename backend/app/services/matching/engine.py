@@ -45,7 +45,7 @@ def apply_cii_correction(position: PositionProfile) -> PositionProfile:
     """CII 通胀修正：必备技能数 > 7 时降级最低权重 20% 为加分技能。
 
     避免"初级岗要求 10 年大模型经验"式虚高要求导致匹配分虚低。
-    精通且跨 ≥30 源的核心技能不降级。无通胀时原样返回。
+    专家级且跨 ≥30 源的核心技能不降级。无通胀时原样返回。
     """
     if len(position.must_skills) <= CII_MUST_THRESHOLD:
         return position

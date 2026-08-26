@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { SkeletonCard, SkeletonList, SkeletonGraph } from '@/components/ui/skeleton'
 import { ResumeUploader } from '@/components/resume/resume-uploader'
 import { ScoreRing, RadarChart, SkillHeatmap, GanttChart } from '@/components/match/charts'
 import {
@@ -621,12 +622,17 @@ export function ResumeMatchPage() {
           )}
 
           {selectedPosition && loadingDetail && (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="size-8 rounded-full border-2 border-ink border-t-transparent animate-spin mb-3" />
-                <p className="text-sm text-ink-muted">加载比对详情…</p>
-              </CardContent>
-            </Card>
+            <div className="space-y-4">
+              {/* 总分 + 三维骨架 */}
+              <SkeletonCard contentLines={4} />
+              {/* 雷达图 + 热力图骨架 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SkeletonGraph variant="radar" className="h-[280px]" />
+                <SkeletonGraph className="h-[280px]" />
+              </div>
+              {/* 差距分析骨架 */}
+              <SkeletonList count={3} />
+            </div>
           )}
 
           {selectedPosition && matchResult && (

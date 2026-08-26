@@ -2,6 +2,7 @@ import { NavLink } from 'react-router'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth'
 import { useUIStore } from '@/store/ui'
+import { prefetchRoute } from '@/lib/prefetch'
 import { mainNav, adminNav, type NavItem } from './nav-config'
 
 /**
@@ -105,6 +106,7 @@ function NavItemLink({ item, onClick }: { item: NavItem; onClick?: () => void })
       to={item.to}
       end={item.to === '/'}
       onClick={onClick}
+      onMouseEnter={() => prefetchRoute(item.to)}
       className={({ isActive }) =>
         cn(
           'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',

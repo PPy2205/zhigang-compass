@@ -139,3 +139,38 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   FE-M5-01 路由过渡动画 — 页面进入时淡入 + 轻微上移
+   ========================================================================== */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.2s ease-out;
+}
+
+/* 骨架屏脉冲 — 已由 animate-pulse 提供，此处补充渐变方向 */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-subtle) 25%,
+    var(--color-elevated) 50%,
+    var(--color-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}

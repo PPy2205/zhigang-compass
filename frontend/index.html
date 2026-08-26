@@ -3,10 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>智岗罗盘</title>
+    <meta name="description" content="智岗罗盘 — 知识图谱驱动的智能人岗匹配系统" />
+    <meta name="theme-color" content="#09090b" />
+    <!-- 预加载关键资源（FE-M5-01 §10.1 首屏优化） -->
+    <link rel="preload" href="/src/main.tsx" as="script" crossorigin />
+    <!-- 内联首屏骨架屏样式：在 JS 加载前避免白屏 -->
+    <style>
+      #root:empty { min-height: 100vh; }
+      #initial-loader {
+        display: flex; align-items: center; justify-content: center;
+        min-height: 100vh; gap: 12px;
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #71717a; font-size: 14px;
+      }
+      #initial-loader .spinner {
+        width: 28px; height: 28px; border-radius: 50%;
+        border: 3px solid #e4e4e7; border-top-color: #09090b;
+        animation: spin 0.6s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (prefers-color-scheme: dark) {
+        #initial-loader { color: #a1a1aa; }
+        #initial-loader .spinner {
+          border-color: #27272a; border-top-color: #fafafa;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-loader">
+        <div class="spinner"></div>
+        <span>正在加载智岗罗盘…</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

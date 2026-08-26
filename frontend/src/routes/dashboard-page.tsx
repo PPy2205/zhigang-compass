@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { apiGet } from '@/lib/api'
+import { prefetchRoute } from '@/lib/prefetch'
 
 interface StatItem {
   label: string
@@ -259,6 +260,7 @@ export function DashboardPage() {
                 <Link
                   key={link.to}
                   to={link.to}
+                  onMouseEnter={() => prefetchRoute(link.to)}
                   className="block rounded-md border border-border p-3 transition-colors hover:bg-subtle hover:border-border-strong"
                 >
                   <div className="flex items-center gap-2 mb-1">

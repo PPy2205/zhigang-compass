@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { SkeletonGraph } from '@/components/ui/skeleton'
 import { Graph2D } from '@/components/graph/graph-2d'
 import {
   NodeDetailPanel,
@@ -18,6 +19,7 @@ import {
 } from '@/components/graph/node-detail-panel'
 import type { GraphData, GraphEdge, GraphNode, GraphViewType, NodeDetail } from '@/components/graph/types'
 import { apiGet, ApiError } from '@/lib/api'
+import { useDebouncedValue } from '@/lib/hooks'
 
 /** 3D 图谱懒加载 — Three.js 约 1.4MB，仅在用户点击"3D"时按需加载 */
 const Graph3D = lazy(() => import('@/components/graph/graph-3d').then((m) => ({ default: m.Graph3D })))
@@ -121,8 +123,9 @@ export function GraphPage() {
   const [raw, setRaw] = useState<GraphData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // 全文检索（GET /graph/search）
+  // 全文检索（GET /graph/search）— 防抖 300ms 自动触发
   const [query, setQuery] = useState('')
+  const debouncedQuery = useDebouncedValue(query, 300)
   const [searchResults, setSearchResults] = useState<{ id: string; name: string; type: string; score: number }[]>([])
   const [searching, setSearching] = useState(false)
   // 技能节点详情（反向岗位 / 先修链 / 课程 / 证据 / 相似）
@@ -238,6 +241,16 @@ export function GraphPage() {
       })
   }
 
+  // 防抖搜索：用户输入 300ms 后自动触发搜索（Enter 立即触发）
+  // 使用 queueMicrotask 延迟 setState，避免 effect 内同步 setState 导致级联渲染
+  useEffect(() => {
+    if (debouncedQuery) {
+      queueMicrotask(() => doSearch(debouncedQuery))
+    } else {
+      queueMicrotask(() => setSearchResults([]))
+    }
+  }, [debouncedQuery])
+
   // 点击搜索结果 / 相似技能 / 岗位必备技能 → 定位技能节点并选中
   // （detailStats 由选中节点实时计算，选中变化会自动触发详情面板重新加载）
   function focusSkill(id: string, name: string) {
@@ -268,12 +281,16 @@ export function GraphPage() {
   // 加载 / 错误 / 空态
   if (loading) {
     return (
-      <Card className="h-[640px] flex items-center justify-center text-sm text-ink-muted">
+      <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="size-6 rounded-full border-2 border-ink border-t-transparent animate-spin" />
-          正在加载图谱全景…
+          <SkeletonGraph className="h-8 w-48" />
+          <SkeletonGraph className="h-8 w-32" />
         </div>
-      </Card>
+        <Card className="h-[640px] flex flex-col items-center justify-center gap-4">
+          <div className="size-8 rounded-full border-2 border-ink border-t-transparent animate-spin" />
+          <p className="text-sm text-ink-muted">正在加载图谱全景…</p>
+        </Card>
+      </div>
     )
   }
 

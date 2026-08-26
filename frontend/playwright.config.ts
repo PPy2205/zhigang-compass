@@ -1,13 +1,20 @@
 import { defineConfig, devices } from '@playwright/test'
 
 /**
- * E2E 测试（TE-M4-02，设计文档 §13.2 E2E Playwright 全流程闭环）。
+ * E2E 测试（TE-M4-02 / FE-M5-02，设计文档 §13.2 E2E Playwright 全流程闭环）。
+ *
+ * FE-M5-02 新增：三视口项目配置（桌面/平板/移动），覆盖设计文档 §10.5
+ * 三断点布局：≥1025px 桌面 / 641-1024px 平板 / ≤640px 移动。
  *
  * 依赖真实基础设施（docker compose 的 postgres/neo4j/redis）与后端：
  * webServer 同时拉起 后端 uvicorn(8000) + 前端 Vite dev(5173)，
  * 前后端通过 Vite proxy（/api → 8000）联通。
  *
- * 运行：pnpm e2e（需先 docker compose up -d postgres redis neo4j）
+ * 运行：
+ *   pnpm e2e                      # 全部项目（桌面 + 平板 + 移动）
+ *   pnpm e2e --project=chromium   # 仅桌面
+ *   pnpm e2e --project=tablet     # 仅平板
+ *   pnpm e2e --project=mobile     # 仅移动
  */
 export default defineConfig({
   testDir: './e2e',
@@ -22,8 +29,22 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
+  // 三视口项目（FE-M5-02 §10.5 三断点响应式）
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
+    },
+    {
+      name: 'tablet',
+      testMatch: ['responsive.spec.ts'],
+      use: { ...devices['Tablet'], viewport: { width: 768, height: 1024 } },
+    },
+    {
+      name: 'mobile',
+      testMatch: ['responsive.spec.ts'],
+      use: { ...devices['Pixel 5'] },
+    },
   ],
   webServer: [
     {

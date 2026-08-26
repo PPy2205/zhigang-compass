@@ -278,6 +278,7 @@ zhigang-compass/
 | [schemas.py](../backend/app/services/matching/schemas.py) | `Necessity` / `SkillRequirement` / `PositionProfile` / `CandidateProfile` / `MatchRequest` / `MatchResult` | ✅ 完整 |
 | [weights.py](../backend/app/services/matching/weights.py) | `load_weights()`（默认 0.6/0.2/0.2，可被 configs/match_weights.json 覆盖） | ✅ 完整 |
 | [engine.py](../backend/app/services/matching/engine.py) | `MatchEngine.match()` / `RuleBasedMatcher` | ⚠️ M3 实现 |
+| [bradley_terry.py](../backend/app/services/matching/bradley_terry.py) | `iterate_weights()` / `bt_log_likelihood()` / `optimize_weights_bt()` / `FeedbackPair` / `IterationResult` | ✅ M5 实现 |
 
 #### 5.3.4 evolution/ — 技能演化检测
 
@@ -394,6 +395,9 @@ JD 抽取主入口。文本 < 10 字符返回空结果；否则 LLM 抽取（M3�
 - 缺必备技能比例惩罚：`must_penalty = 1 - (missing/total) × 0.3`
 - 加分技能空集保护：`if len(nice_skills) == 0: nice_score = 1.0`
 
+#### `iterate_weights(min_pairs=30, dry_run=False)` — [matching/bradley_terry.py](../backend/app/services/matching/bradley_terry.py)
+M5 Bradley-Terry 反馈学习入口（设计文档 9.3）。从 `match_feedback` + `match_results` 收集成对比较数据（同一用户 👍 > 👎），用 BT 对数似然最大化搜索权重 (w_must, w_nice, w_exp)。反馈对数 < `min_pairs` 时退化至 Optuna 静态权重。CLI：`scripts/iterate_match_weights.py`。
+
 ### 6.4 演化检测
 
 #### `compute_zscore(current, mean, std)` — [evolution/detector.py](../backend/app/services/evolution/detector.py)
@@ -468,6 +472,7 @@ services.discovery:
               └─> detector.py ──> confidence.py
 
 services.matching:  schemas.py ← engine.py ← weights.py (+ configs/match_weights.json)
+                  schemas.py ← bradley_terry.py ← weights.py (M5 反馈迭代 → configs/match_weights.json)
 services.evolution: schemas.py ← detector.py, graph_version.py
 ```
 

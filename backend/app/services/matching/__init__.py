@@ -21,6 +21,13 @@ from app.services.matching.engine import (
 )
 from app.services.matching.semantic import SemanticUnavailableError, SkillEmbedder
 from app.services.matching.weights import load_weights, DEFAULT_WEIGHTS, load_sim_threshold
+from app.services.matching.bradley_terry import (
+    FeedbackPair,
+    IterationResult,
+    bt_log_likelihood,
+    iterate_weights,
+    optimize_weights_bt,
+)
 
 __all__ = [
     "CandidateProfile",
@@ -36,8 +43,13 @@ __all__ = [
     "SkillEmbedder",
     "SkillRequirement",
     "DEFAULT_WEIGHTS",
+    "FeedbackPair",
+    "IterationResult",
     "apply_cii_correction",
+    "bt_log_likelihood",
+    "iterate_weights",
     "load_sim_threshold",
     "load_weights",
+    "optimize_weights_bt",
     "score_position",
 ]
